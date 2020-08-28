@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Arbee.StructuredLogging.Core;
 using Microsoft.Extensions.Logging;
 
 namespace Arbee.StructuredLogging.MicrosoftExtensions.Extensions
@@ -10,9 +14,21 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Extensions
     /// </summary>
     public static class LoggerExtensions
     {
-        public static void Log(this ILogger logger)
+        /// <summary>
+        /// Logs the <paramref name="event"/>.
+        /// </summary>
+        /// <param name="logger">The logger to log with.</param>
+        /// <param name="event">The event to log.</param>
+        public static void Log<T>(this ILogger logger, LogLevel level, T @event)
         {
-            throw new NotImplementedException();
+            var anonymousEvent = new AnonymousEvent<T>(@event, level.ToString());
+
+            logger.Log(anonymousEvent);
+        }
+
+        public static void Log<T>(this ILogger logger, IEvent<T> @event)
+        {
+            logger.Log(LogLevel.Information, new EventId(1), @event, null, (state, exception) => JsonSerializer.Serialize(state));
         }
     }
 }
