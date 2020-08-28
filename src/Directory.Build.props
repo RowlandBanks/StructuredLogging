@@ -1,0 +1,26 @@
+<Project>
+	<PropertyGroup Label="Configure assembly names and namespaces">
+		<AssemblyName>Arbee.$(SolutionName).$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>$(AssemblyName)</RootNamespace>
+	</PropertyGroup>
+	
+	<PropertyGroup Label="Enable SourceLink Support">
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<DebugType>portable</DebugType>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+	</PropertyGroup>
+
+	<!-- Choose the right package for your source-control provider. I'm using Github -->
+	<ItemGroup Label="Enable SourceLink GitHub Support">
+		<!-- Enable github sourcelink integration. 
+		   See https://github.com/dotnet/sourcelink.
+	  -->
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All"/>
+	</ItemGroup>
+
+	<PropertyGroup
+		Label="Normalise stack trace file locations"
+		Condition="$(BuildingInsideVisualStudio) != 'true'">
+		<PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=X:\</PathMap>
+	</PropertyGroup>
+</Project>
