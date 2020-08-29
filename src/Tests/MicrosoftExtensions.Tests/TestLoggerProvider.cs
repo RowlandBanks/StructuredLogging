@@ -4,10 +4,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
 {
-    internal class TestLoggerProvider : ILoggerProvider
+    internal class TestLoggerProvider : ILoggerProvider, ISupportExternalScope
     {
         private readonly ConcurrentDictionary<string, TestLogger> _loggers =
             new ConcurrentDictionary<string, TestLogger>();
+
+        private IExternalScopeProvider _scopeProvider;
 
         /// <summary>
         /// Provides access to the generated loggers, for verifying tests.
@@ -23,7 +25,15 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
 
         private TestLogger InstantiateLogger(string categoryName)
         {
-            return new TestLogger();
+            return new TestLogger
+            {
+                ScopeProvider = _scopeProvider
+            };
+        }
+
+        public void SetScopeProvider(IExternalScopeProvider scopeProvider)
+        {
+            _scopeProvider = scopeProvider;
         }
 
         public void Dispose()
