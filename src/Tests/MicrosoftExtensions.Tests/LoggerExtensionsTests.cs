@@ -28,18 +28,8 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
         [Fact]
         public void LogsAnonymousEvent()
         {
-            // Assert
-            var loggerProvider = new TestLoggerProvider();
-            var services = new ServiceCollection()
-                .AddLogging(builder =>
-                {
-                    builder
-                        .ClearProviders()
-                        .AddProvider(loggerProvider);
-                })
-                .BuildServiceProvider();
-
-            var logger = services.GetRequiredService<ILogger<LoggerExtensionsTests>>();
+            // Arrange
+            var loggerProvider = GetLogger(out var logger);
 
             // An anonymous object that represents some log state.
             var logState = new
@@ -72,18 +62,8 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
         [Fact]
         public void LogsCallingMethod()
         {
-            // Assert
-            var loggerProvider = new TestLoggerProvider();
-            var services = new ServiceCollection()
-                .AddLogging(builder =>
-                {
-                    builder
-                        .ClearProviders()
-                        .AddProvider(loggerProvider);
-                })
-                .BuildServiceProvider();
-
-            var logger = services.GetRequiredService<ILogger<LoggerExtensionsTests>>();
+            // Arrange
+            var loggerProvider = GetLogger(out var logger);
 
             // An anonymous object that represents some log state.
             var logState = new
@@ -114,19 +94,9 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
         public void LogsScope()
         {
             // Background: Proves that scope variables are logged.
-            
-            // Assert
-            var loggerProvider = new TestLoggerProvider();
-            var services = new ServiceCollection()
-                .AddLogging(builder =>
-                {
-                    builder
-                        .ClearProviders()
-                        .AddProvider(loggerProvider);
-                })
-                .BuildServiceProvider();
 
-            var logger = services.GetRequiredService<ILogger<LoggerExtensionsTests>>();
+            // Arrange
+           var loggerProvider = GetLogger(out var logger);
 
             using (logger.BeginScope(new
             {
@@ -147,12 +117,31 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             var testLogger = loggerProvider[typeof(LoggerExtensionsTests).FullName];
 
             var message = Assert.Single(testLogger.Messages);
+            _output.WriteLine(message);
             var json = JObject.Parse(message);
 
             // Assert
             // Prove that the scoped logging, and the in-scope logging works.
             json.Value<string>("Application").Equals("my-service");
             json["State"].Value<string>("Name").Equals("Grace Hopper");
+        }
+
+        private static TestLoggerProvider GetLogger(out ILogger<LoggerExtensionsTests> logger)
+        {
+            var loggerProvider = new TestLoggerProvider();
+            var services = new ServiceCollection()
+                .AddLogging(builder =>
+                {
+                    builder
+                        .ClearProviders()
+                        .AddProvider(loggerProvider)
+                        .AddStructuredLogging();
+                })
+                .BuildServiceProvider();
+
+            logger = services.GetRequiredService<ILogger<LoggerExtensionsTests>>();
+
+            return loggerProvider;
         }
     }
 }

@@ -16,7 +16,10 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
         /// </summary>
         /// <param name="category"></param>
         /// <returns></returns>
-        public TestLogger this[string category] => _loggers[category];
+        public TestLogger this[string category] =>
+            _loggers.TryGetValue(category, out var logger) ?
+                logger :
+                throw new Exception($"Logger '{category}' was never instantiated");
 
         public ILogger CreateLogger(string categoryName)
         {

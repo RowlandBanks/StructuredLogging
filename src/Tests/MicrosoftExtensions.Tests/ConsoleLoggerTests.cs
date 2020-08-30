@@ -44,7 +44,9 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
                 var services = new ServiceCollection()
                     .AddLogging(builder =>
                     {
-                        builder.AddConsole(o => o.Format = ConsoleLoggerFormat.Systemd);
+                        builder
+                            .AddConsole(o => o.Format = ConsoleLoggerFormat.Systemd)
+                            .AddStructuredLogging();
                     })
                     .BuildServiceProvider();
 
@@ -89,7 +91,9 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
                 var services = new ServiceCollection()
                     .AddLogging(builder =>
                     {
-                        builder.AddConsole(o => o.Format = ConsoleLoggerFormat.Systemd);
+                        builder
+                            .AddConsole(o => o.Format = ConsoleLoggerFormat.Systemd)
+                            .AddStructuredLogging();
                     })
                     .BuildServiceProvider();
 
@@ -120,7 +124,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             json.Value<int>("Line").Should().BeGreaterThan(1);
         }
 
-        [Fact(Skip = "Console logger does not support complex scopes")]
+        [Fact]
         public void LogsScope()
         {
             // Background: Proves that scope variables are logged.
@@ -134,7 +138,9 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
                 var services = new ServiceCollection()
                     .AddLogging(builder =>
                     {
-                        builder.AddConsole(o => o.Format = ConsoleLoggerFormat.Systemd);
+                        builder
+                            .AddConsole(o => o.Format = ConsoleLoggerFormat.Systemd)
+                            .AddStructuredLogging();
                     })
                     .BuildServiceProvider();
 
