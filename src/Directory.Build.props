@@ -2,6 +2,7 @@
 	<PropertyGroup Label="Configure assembly names and namespaces">
 		<AssemblyName>Arbee.$(SolutionName).$(MSBuildProjectName)</AssemblyName>
 		<RootNamespace>$(AssemblyName)</RootNamespace>
+    <LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup Label="Enable SourceLink Support">

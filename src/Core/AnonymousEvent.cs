@@ -25,6 +25,8 @@ namespace Arbee.StructuredLogging.Core
 
         public string Message => "NOT IMPLEMENTED";
 
+        public Caller Caller { get; set; }
+
         public DateTimeOffset Timestamp { get; } = DateTimeOffset.UtcNow;
     }
 }

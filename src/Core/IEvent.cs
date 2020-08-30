@@ -38,5 +38,7 @@ namespace Arbee.StructuredLogging.Core
         T State { get; }
 
         string Message { get; }
+
+        Caller Caller { get; set; }
     }
 }
