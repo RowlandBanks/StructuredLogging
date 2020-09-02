@@ -137,6 +137,30 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             var loggerProvider = GetLogger(out var logger);
 
             // Act
+            logger.LogInformation("A log message");
+
+            // Gather the output
+            var testLogger = loggerProvider[typeof(LoggerExtensionsTests).FullName];
+
+            var message = Assert.Single(testLogger.Messages);
+            _output.WriteLine(message);
+            var json = JObject.Parse(message);
+
+            // Assert
+            // Prove that the scoped logging, and the in-scope logging works.
+            json.Value<string>("Message").Should().Be("A log message");
+            json.Values().Count().Should().Be(1);
+        }
+
+        [Fact]
+        public void LogInformation_Formatted()
+        {
+            // Background: Proves that the LogInformation method logs correctly.
+
+            // Arrange
+            var loggerProvider = GetLogger(out var logger);
+
+            // Act
             logger.LogInformation("Favourite fruit: {FavouriteFruit}", "Bananas");
 
             // Gather the output
