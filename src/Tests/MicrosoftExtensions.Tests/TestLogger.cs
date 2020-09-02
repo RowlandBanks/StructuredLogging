@@ -27,20 +27,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            // Build up a JSON object based on the scoped state.
-            //var logEvent = new JObject();
-            //ScopeProvider?.ForEachScope((scope, state) =>
-            //{
-            //    AddState(logEvent, scope);
-            //}, state);
-
-            //AddState(logEvent, state);
             _messages.Add(formatter(state, exception));
-        }
-
-        private void AddState(JObject logEvent, object scope)
-        {
-            logEvent.Merge(JObject.FromObject(scope));
         }
     }
 }

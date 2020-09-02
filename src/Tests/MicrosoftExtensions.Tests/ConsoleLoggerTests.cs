@@ -73,10 +73,10 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
                 .Should()
                 .BeWithin(TimeSpan.FromSeconds(10))
                 .Before(DateTime.UtcNow);
-            json.Value<string>("Id").Equals(1);
-            json.Value<string>("Name").Equals("LoggingEvent");
-            json.Value<string>("Level").Equals("Information");
-            json["State"].Value<string>("Name").Equals("Grace Hopper");
+            json.Value<int>("Id").Should().Be(1);
+            json.Value<string>("Name").Should().Be("LogEvent");
+            json.Value<string>("Level").Should().Be("Information");
+            json["State"].Value<string>("Name").Should().Be("Grace Hopper");
         }
 
         [Fact]
@@ -117,8 +117,8 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
 
             // Assert
             // Prove that the key logging fields are set correctly.
-            json.Value<string>("Member").Equals(nameof(LogsCallingMethod));
-            json.Value<string>("File").Equals("LoggerExtensionsTests");
+            json.Value<string>("Member").Should().Be(nameof(LogsCallingMethod));
+            json.Value<string>("File").Should().EndWith($"{Path.DirectorySeparatorChar}ConsoleLoggerTests.cs");
             // We can't prove the exact line number as it will vary based on
             // compilation options, so we just prove it's greater than 1.
             json.Value<int>("Line").Should().BeGreaterThan(1);
@@ -170,8 +170,8 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
 
             // Assert
             // Prove that the scoped logging, and the in-scope logging works.
-            json.Value<string>("Application").Equals("my-service");
-            json["State"].Value<string>("Name").Equals("Grace Hopper");
+            json.Value<string>("Application").Should().Be("my-service");
+            json["State"].Value<string>("Name").Should().Be("Grace Hopper");
         }
 
         private static IEnumerable<string> GetRawJsonFromConsoleOutput(StringBuilder sb)
