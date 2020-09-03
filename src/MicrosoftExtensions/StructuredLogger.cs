@@ -21,6 +21,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
 
             _options = new JsonSerializerOptions();
             _options.Converters.Add(new FormattedLogValuesConverter());
+            _options.Converters.Add(new ExceptionConverter());
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -56,6 +57,11 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
                 {
                     json = JsonMerge.Merge(json, JsonSerializer.Serialize(scopeObject));
                 }, state);
+
+                if (exception != null)
+                {
+                    json = JsonMerge.Merge(json, JsonSerializer.Serialize(new { Exception = exception }, _options));
+                }
 
                 return JsonMerge.Merge(json, JsonSerializer.Serialize(state, _options));
             });

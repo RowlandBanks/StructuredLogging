@@ -43,11 +43,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             logger.Log(LogLevel.Information, logState);
 
             // Gather the output
-            var testLogger = loggerProvider[typeof(LoggerExtensionsTests).FullName];
-
-            var message = Assert.Single(testLogger.Messages);
-            _output.WriteLine(message);
-            var json = JObject.Parse(message);
+            var json = GetLogMessages(loggerProvider).Single();
 
             // Assert
             // Prove that the key logging fields are set correctly.
@@ -77,11 +73,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             logger.Log(LogLevel.Information, logState);
 
             // Gather the output
-            var testLogger = loggerProvider[typeof(LoggerExtensionsTests).FullName];
-
-            var message = Assert.Single(testLogger.Messages);
-            _output.WriteLine(JObject.Parse(message).ToString());
-            var json = JObject.Parse(message)["Caller"];
+            var json = GetLogMessages(loggerProvider).Single()["Caller"];
 
             // Assert
             // Prove that the key logging fields are set correctly.
@@ -116,11 +108,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             }
 
             // Gather the output
-            var testLogger = loggerProvider[typeof(LoggerExtensionsTests).FullName];
-
-            var message = Assert.Single(testLogger.Messages);
-            _output.WriteLine(message);
-            var json = JObject.Parse(message);
+            var json = GetLogMessages(loggerProvider).Single();
 
             // Assert
             // Prove that the scoped logging, and the in-scope logging works.
@@ -140,16 +128,50 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             logger.LogInformation("A log message");
 
             // Gather the output
-            var testLogger = loggerProvider[typeof(LoggerExtensionsTests).FullName];
-
-            var message = Assert.Single(testLogger.Messages);
-            _output.WriteLine(message);
-            var json = JObject.Parse(message);
+            var json = GetLogMessages(loggerProvider).Single();
 
             // Assert
             // Prove that the scoped logging, and the in-scope logging works.
             json.Value<string>("Message").Should().Be("A log message");
             json.Values().Count().Should().Be(1);
+        }
+
+
+        [Fact]
+        public void LogInformation_LogsException()
+        {
+            // Background: Proves that the LogInformation method logs correctly.
+
+            // Arrange
+            var loggerProvider = GetLogger(out var logger);
+
+            // Act
+            Exception ex;
+            try
+            {
+                throw new NullReferenceException("My exception")
+                {
+                    Source = "unit-test"
+                };
+            }
+            catch(Exception e)
+            {
+                ex = e;
+            }
+
+            logger.LogInformation(ex, "A log message");
+
+            // Gather the output
+            var json = GetLogMessages(loggerProvider).Single()["Exception"];
+
+            // Assert
+            // Prove that the scoped logging, and the in-scope logging works.
+            json.Value<string>("Message").Should().Be("My exception");
+            json.Value<string>("Source").Should().Be("unit-test");
+            json.Value<string>("Name").Should().Be(nameof(NullReferenceException));
+            json.Value<string>("FullName").Should().Be(typeof(NullReferenceException).FullName);
+            json.Value<string>("StackTrace").Should().StartWith("   at Arbee.StructuredLogging.MicrosoftExtensions.Tests");
+            json.Values().Count().Should().Be(5);
         }
 
         [Fact]
@@ -164,17 +186,24 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             logger.LogInformation("Favourite fruit: {FavouriteFruit}", "Bananas");
 
             // Gather the output
-            var testLogger = loggerProvider[typeof(LoggerExtensionsTests).FullName];
-
-            var message = Assert.Single(testLogger.Messages);
-            _output.WriteLine(message);
-            var json = JObject.Parse(message);
+            var json = GetLogMessages(loggerProvider).Single();
 
             // Assert
             // Prove that the scoped logging, and the in-scope logging works.
             json.Value<string>("FavouriteFruit").Should().Be("Bananas");
             json.Value<string>("Message").Should().Be("Favourite fruit: Bananas");
             json.Values().Count().Should().Be(2);
+        }
+
+        private IEnumerable<JObject> GetLogMessages(TestLoggerProvider loggerProvider)
+        {
+            var testLogger = loggerProvider[typeof(LoggerExtensionsTests).FullName];
+
+            if (testLogger.Messages.FirstOrDefault() is string message)
+            {
+                _output.WriteLine(message);
+            }
+            return testLogger.Messages.Select(m => JObject.Parse(m));
         }
 
         [Fact]
