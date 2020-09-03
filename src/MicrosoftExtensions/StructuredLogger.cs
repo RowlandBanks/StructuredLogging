@@ -9,13 +9,18 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
 {
     internal class StructuredLogger : ILogger
     {
+        private readonly string _category;
         private readonly ILogger _wrappedLogger;
         private readonly IExternalScopeProvider _scopeProvider;
 
         private readonly JsonSerializerOptions _options;
 
-        public StructuredLogger(ILogger wrappedLogger, IExternalScopeProvider scopeProvider)
+        public StructuredLogger(
+            string category,
+            ILogger wrappedLogger,
+            IExternalScopeProvider scopeProvider)
         {
+            _category = category;
             _wrappedLogger = wrappedLogger ?? throw new ArgumentNullException(nameof(wrappedLogger));
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
 
@@ -62,6 +67,8 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
                 {
                     json = JsonMerge.Merge(json, JsonSerializer.Serialize(new { Exception = exception }, _options));
                 }
+
+                json = JsonMerge.Merge(json, JsonSerializer.Serialize(new { Category = _category}, _options));
 
                 return JsonMerge.Merge(json, JsonSerializer.Serialize(state, _options));
             });

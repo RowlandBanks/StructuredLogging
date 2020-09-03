@@ -133,9 +133,26 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             // Assert
             // Prove that the scoped logging, and the in-scope logging works.
             json.Value<string>("Message").Should().Be("A log message");
-            json.Values().Count().Should().Be(1);
         }
 
+        [Fact]
+        public void LogInformation_LogsCategory()
+        {
+            // Background: Proves that the LogInformation method logs correctly.
+
+            // Arrange
+            var loggerProvider = GetLogger(out var logger);
+
+            // Act
+            logger.LogInformation("A log message");
+
+            // Gather the output
+            var json = GetLogMessages(loggerProvider).Single();
+
+            // Assert
+            // Prove that the scoped logging, and the in-scope logging works.
+            json.Value<string>("Category").Should().Be(typeof(LoggerExtensionsTests).FullName);
+        }
 
         [Fact]
         public void LogInformation_LogsException()
@@ -171,7 +188,6 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             json.Value<string>("Name").Should().Be(nameof(NullReferenceException));
             json.Value<string>("FullName").Should().Be(typeof(NullReferenceException).FullName);
             json.Value<string>("StackTrace").Should().StartWith("   at Arbee.StructuredLogging.MicrosoftExtensions.Tests");
-            json.Values().Count().Should().Be(5);
         }
 
         [Fact]
@@ -192,7 +208,6 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             // Prove that the scoped logging, and the in-scope logging works.
             json.Value<string>("FavouriteFruit").Should().Be("Bananas");
             json.Value<string>("Message").Should().Be("Favourite fruit: Bananas");
-            json.Values().Count().Should().Be(2);
         }
 
         private IEnumerable<JObject> GetLogMessages(TestLoggerProvider loggerProvider)
@@ -233,7 +248,6 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             json["Fruit"].Value<string>("Color").Should().Be("Yellow");
             json["Fruit"].Value<string>("Name").Should().Be("Banana");
             json.Value<string>("Message").Should().Be("Favourite fruit: { Color = Yellow, Name = Banana }");
-            json.Values().Count().Should().Be(2);
         }
 
         [Fact]
@@ -259,7 +273,6 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
             // Assert
             // Prove that the scoped logging, and the in-scope logging works.
             json.Value<string>("Message").Should().Be("MyMessage: some_message");
-            json.Values().Count().Should().Be(1);
         }
 
         private static TestLoggerProvider GetLogger(out ILogger<LoggerExtensionsTests> logger)

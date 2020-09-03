@@ -23,7 +23,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new StructuredLogger(_wrappedFactory.CreateLogger(categoryName), _scopeProvider);
+            return new StructuredLogger(categoryName, _wrappedFactory.CreateLogger(categoryName), _scopeProvider);
         }
 
         public void Dispose()
