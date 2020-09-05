@@ -4,7 +4,7 @@ using System.Text.Json;
 using Arbee.StructuredLogging.Core;
 using Microsoft.Extensions.Logging;
 
-namespace Arbee.StructuredLogging.MicrosoftExtensions.Extensions
+namespace Microsoft.Extensions.Logging
 {
     /// <summary>
     /// Extension methods on <see cref="ILogger{T}"/>

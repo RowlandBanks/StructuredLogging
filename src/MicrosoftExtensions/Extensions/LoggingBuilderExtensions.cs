@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using Arbee.StructuredLogging.MicrosoftExtensions.JsonConverters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,10 +18,23 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Extensions
         /// <returns><c>builder</c></returns>
         public static ILoggingBuilder AddStructuredLogging(this ILoggingBuilder builder)
         {
+            return builder.AddStructuredLogging(_ => { });
+        }
+
+        public static ILoggingBuilder AddStructuredLogging(
+            this ILoggingBuilder builder,
+            Action<IStructuredLoggingBuilder> configure)
+        {
             var descriptor = builder.Services.Single(s => s.ServiceType == typeof(ILoggerFactory));
 
+            var jsonSerializerOptions = new JsonSerializerOptions();
+            jsonSerializerOptions.Converters.Add(new FormattedLogValuesConverter());
+            jsonSerializerOptions.Converters.Add(new ExceptionConverter());
+            var loggingBuilder = new StructuredLoggingBuilder(jsonSerializerOptions);
+            configure(loggingBuilder);
+
             builder.Services.AddScoped<ILoggerFactory>(provider =>
-                new StructuredLoggerFactory(GetInstance<ILoggerFactory>(provider, descriptor)));
+                new StructuredLoggerFactory(GetInstance<ILoggerFactory>(provider, descriptor), jsonSerializerOptions));
             return builder;
         }
 

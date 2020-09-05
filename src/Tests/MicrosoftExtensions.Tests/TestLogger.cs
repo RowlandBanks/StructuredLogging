@@ -29,5 +29,10 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Tests
         {
             _messages.Add(formatter(state, exception));
         }
+
+        internal object Single()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
 namespace Arbee.StructuredLogging.MicrosoftExtensions
@@ -9,11 +10,13 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
     internal class StructuredLoggerFactory : ILoggerFactory
     {
         private readonly ILoggerFactory _wrappedFactory;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
         private readonly IExternalScopeProvider _scopeProvider = new LoggerExternalScopeProvider();
 
-        public StructuredLoggerFactory(ILoggerFactory wrappedFactory)
+        public StructuredLoggerFactory(ILoggerFactory wrappedFactory, JsonSerializerOptions jsonSerializerOptions)
         {
             _wrappedFactory = wrappedFactory ?? throw new ArgumentNullException(nameof(wrappedFactory));
+            _jsonSerializerOptions = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
         }
 
         public void AddProvider(ILoggerProvider provider)
@@ -23,7 +26,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
 
         public ILogger CreateLogger(string categoryName)
         {
-            return new StructuredLogger(categoryName, _wrappedFactory.CreateLogger(categoryName), _scopeProvider);
+            return new StructuredLogger(categoryName, _jsonSerializerOptions, _wrappedFactory.CreateLogger(categoryName), _scopeProvider);
         }
 
         public void Dispose()

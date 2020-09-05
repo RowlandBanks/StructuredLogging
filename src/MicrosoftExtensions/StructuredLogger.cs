@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
-using Arbee.StructuredLogging.MicrosoftExtensions.JsonConverters;
 using Microsoft.Extensions.Logging;
 
 namespace Arbee.StructuredLogging.MicrosoftExtensions
@@ -10,6 +7,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
     internal class StructuredLogger : ILogger
     {
         private readonly string _category;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
         private readonly ILogger _wrappedLogger;
         private readonly IExternalScopeProvider _scopeProvider;
 
@@ -17,16 +15,14 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
 
         public StructuredLogger(
             string category,
+            JsonSerializerOptions jsonSerializerOptions,
             ILogger wrappedLogger,
             IExternalScopeProvider scopeProvider)
         {
             _category = category;
+            _options = jsonSerializerOptions ?? throw new ArgumentNullException(nameof(jsonSerializerOptions));
             _wrappedLogger = wrappedLogger ?? throw new ArgumentNullException(nameof(wrappedLogger));
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-
-            _options = new JsonSerializerOptions();
-            _options.Converters.Add(new FormattedLogValuesConverter());
-            _options.Converters.Add(new ExceptionConverter());
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -68,7 +64,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions
                     json = JsonMerge.Merge(json, JsonSerializer.Serialize(new { Exception = exception }, _options));
                 }
 
-                json = JsonMerge.Merge(json, JsonSerializer.Serialize(new { Category = _category}, _options));
+                json = JsonMerge.Merge(json, JsonSerializer.Serialize(new { Category = _category }, _options));
 
                 return JsonMerge.Merge(json, JsonSerializer.Serialize(state, _options));
             });
