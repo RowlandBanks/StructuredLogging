@@ -40,12 +40,12 @@ namespace Microsoft.Extensions.Logging
             @event.Caller.File ??= file;
             @event.Caller.Line ??= line;
 
-            string SerializeState(IEvent<T> theEvent, Exception e)
-            {
-                return JsonSerializer.Serialize(theEvent);
-            }
+            logger.Log(LogLevel.Information, new EventId(1), @event, null, WarnIfStructuredLoggingNotSet);
+        }
 
-            logger.Log(LogLevel.Information, new EventId(1), @event, null, SerializeState);
+        private static string WarnIfStructuredLoggingNotSet<T>(IEvent<T> arg1, Exception arg2)
+        {
+            return "Call AddStructuredLogging() to enable structured logging.";
         }
     }
 }

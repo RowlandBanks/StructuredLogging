@@ -4,6 +4,7 @@ using Arbee.StructuredLogging.SampleApp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace SampleApp
 {
@@ -17,10 +18,16 @@ namespace SampleApp
                     services
                         .AddHostedService<LoggingService>();
                 })
+                //.UseSerilog((context, serviceProvider, configure) =>
+                //{
+                //    configure
+                //        .WriteTo.Console();
+                //})
                 .ConfigureLogging(builder =>
                 {
                     builder
-                        .AddConsole()
+                        //.ClearProviders()
+                        //.AddSerilog()
                         .AddStructuredLogging();
                 })
                 .Build();

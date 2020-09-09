@@ -25,7 +25,7 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Extensions
             this ILoggingBuilder builder,
             Action<IStructuredLoggingBuilder> configure)
         {
-            var descriptor = builder.Services.Single(s => s.ServiceType == typeof(ILoggerFactory));
+            var descriptor = builder.Services.FirstOrDefault(s => s.ServiceType == typeof(ILoggerFactory));
 
             var jsonSerializerOptions = new JsonSerializerOptions();
             jsonSerializerOptions.Converters.Add(new FormattedLogValuesConverter());
