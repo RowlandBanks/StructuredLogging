@@ -25,7 +25,9 @@ namespace Arbee.StructuredLogging.MicrosoftExtensions.Extensions
             this ILoggingBuilder builder,
             Action<IStructuredLoggingBuilder> configure)
         {
-            var descriptor = builder.Services.FirstOrDefault(s => s.ServiceType == typeof(ILoggerFactory));
+            // We take the last registered logger factory as the sole source for loggers - for example, Serilog is designed to
+            // completely replace the inbuilt Microsoft Extensions logging factory.
+            var descriptor = builder.Services.LastOrDefault(s => s.ServiceType == typeof(ILoggerFactory));
 
             var jsonSerializerOptions = new JsonSerializerOptions();
             jsonSerializerOptions.Converters.Add(new FormattedLogValuesConverter());

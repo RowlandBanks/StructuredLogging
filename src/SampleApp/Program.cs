@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 
 namespace SampleApp
 {
@@ -18,16 +19,17 @@ namespace SampleApp
                     services
                         .AddHostedService<LoggingService>();
                 })
-                //.UseSerilog((context, serviceProvider, configure) =>
-                //{
-                //    configure
-                //        .WriteTo.Console();
-                //})
+                .UseSerilog((context, serviceProvider, configure) =>
+                {
+                    configure
+                        .MinimumLevel.Debug()
+                        .Enrich.FromLogContext()
+                        .WriteTo.Console(outputTemplate: "SERILOG {Level:u3}: {Message}{NewLine}");
+                })
                 .ConfigureLogging(builder =>
                 {
                     builder
-                        //.ClearProviders()
-                        //.AddSerilog()
+                        .AddConsole()
                         .AddStructuredLogging();
                 })
                 .Build();
