@@ -28,6 +28,7 @@ namespace Arbee.StructuredLogging.SampleApp
         {
             return Task.Run(() =>
             {
+                _logger.LogInformation("Starting new task at {TaskStarted}", DateTime.UtcNow);
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     var nextUser = _testUsers.Generate();
@@ -38,8 +39,9 @@ namespace Arbee.StructuredLogging.SampleApp
                         TransactionId = MiniGuid.NewGuid()
                     });
 
-                    Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                    Task.Delay(TimeSpan.FromSeconds(5), stoppingToken).Wait();
                 }
+                _logger.LogInformation("Stopping task at {TaskStarted}", DateTime.UtcNow);
             });
         }
     }
